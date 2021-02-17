@@ -7,7 +7,8 @@ import { Container, Row, Col } from "reactstrap";
 export default class App extends Component {
   state = {
     currentCategory : "",
-    products: []
+    products: [],
+    cart: []
   }
 
   componentDidMount() {
@@ -28,15 +29,24 @@ export default class App extends Component {
     .then(response => this.setState({products: response}));
   }
 
+  addToCart = (product) => {
+    let newCart = this.state.cart;
+    let adddedItem = newCart.find(c => c.product.id === product.id);
+    if (adddedItem) {
+      adddedItem.quantity += 1;
+    } else {
+      newCart.push({product: product, quantity: 1}); 
+    }
+    this.setState({cart: newCart});
+  }
+
   render() {
     let productInfo = { title: "Product List" };
     let categoryInfo = { title: "Category List" };
     return (
       <div>
         <Container>
-          <Row>
-            <Navi />
-          </Row>
+            <Navi cart={this.state.cart} />
           <Row>
             <Col xs="3">
               <CategoryList currentCategory={this.state.currentCategory} changeCategory={this.changeCategory} info={categoryInfo} />
@@ -45,6 +55,7 @@ export default class App extends Component {
               <ProductList 
               products={this.state.products}
               currentCategory={this.state.currentCategory} 
+              addToCart={this.addToCart}
               info={productInfo} />
             </Col>
           </Row>
